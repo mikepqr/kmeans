@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def randomdata(K=2, m=100, ndim=2, sigma=0.2):
+def randomdata(K=4, m=1000, ndim=2, sigma=0.4):
     """Generate random data for use in testing K-means algorithm.
     """
 
@@ -50,6 +50,10 @@ def choosestartingpoint(x, K):
 
 
 def calcdistortion(x, c, u):
+    """
+    For a given set of data, cluster allocation and cluster centroids,
+    calculate the distortion (i.e. cost function)
+    """
     m = x.shape[0]
     distortion = 0
     for i in range(m):
@@ -59,10 +63,18 @@ def calcdistortion(x, c, u):
     return distortion
 
 
+def plotkmeans(x, c, centroids):
+    """Scatter plot cluter centroids and data coded by cluster allocation"""
+    markers = ['s', 'o', 'h', '+']
+    colors = ['red', 'blue', 'green', 'cyan']
+    for i in range(0, centroids.shape[0]):
+        plt.scatter(x[c == i].T[0], x[c == i].T[1],
+                    marker=markers[i], color=colors[i])
+    plt.scatter(centroids.T[0], centroids.T[1], marker='*')
+
+
 def kmeans(x, K, n=10):
-    """
-    Divide data x into K clusters using K-means unsupervised learning
-    """
+    """Divide data x into K clusters using K-means unsupervised learning"""
     m, ndim = x.shape
     c = np.zeros(m)
 
@@ -87,15 +99,14 @@ def kmeans(x, K, n=10):
                 centroids = newcentroids
 
         distortion = calcdistortion(x, c, centroids)
+
         try:
             lowestdistortion
         except NameError:
-            print "New lowest distortion", distortion
             lowestdistortion = distortion
             bestcentroids = centroids
 
         if distortion < lowestdistortion:
-            print "New lowest distortion", distortion
             lowestdistortion = distortion
             bestcentroids = centroids
 
@@ -103,11 +114,10 @@ def kmeans(x, K, n=10):
     for i in range(0, m):
         c[i] = clusterassign(x[i], bestcentroids)
 
-    markers = ['s', 'o', 'h', '+']
-    colors = ['red', 'blue', 'green', 'cyan']
-    for i in range(0, K):
-        plt.scatter(x[c == i].T[0], x[c == i].T[1],
-                    marker=markers[i], color=colors[i])
-    plt.scatter(bestcentroids.T[0], bestcentroids.T[1], marker='*')
+    return bestcentroids, c
 
-    return None
+
+def demo(m=1000, K=4):
+    x = randomdata(K=K, m=m)
+    centroids, c = kmeans(x, K)
+    plotkmeans(x, c, centroids)
