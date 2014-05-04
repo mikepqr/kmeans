@@ -88,22 +88,26 @@ def kmeans(x, K, n=10):
     for j in range(n):
         # Initialize centroids
         centroids = choosestartingpoint(x, K)
+        newcentroids = np.zeros((K, ndim))
 
         while True:
             # Record centroids
             centroidshistory.append(centroids)
-            newcentroids = np.zeros((K, ndim))
-            # For every data point, determine cluster allocation
+            # For every data point i, find cluster allocation
             for i in range(0, m):
                 c[i] = clusterassign(x[i], centroids)
-            # Determine new centroids based on new allocations
-            for i in range(0, K):
-                newcentroids[i] = np.mean(x[c == i], 0)
+            # For every cluster j, find new centroid based on new allocations
+            for j in range(0, K):
+                newcentroids[j] = np.mean(x[c == j], 0)
+
             # Repeat until centroids no longer moving
             if np.all((newcentroids - centroids) == 0.0):
                 break
             else:
-                centroids = newcentroids
+                # Update centroids. Note copy is necessary, otherwise future
+                # changes to newcentroids will change centroids, guaranteeing
+                # that the loop runs only once
+                centroids = newcentroids.copy()
 
         distortion = calcdistortion(x, c, centroids)
 
