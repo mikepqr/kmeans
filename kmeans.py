@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def randomdata(K=4, m=1000, ndim=2, sigma=0.4):
@@ -66,12 +67,12 @@ def calcdistortion(x, c, u):
 def plotkmeans(x, c, centroids):
     """Scatter plot cluter centroids and data coded by cluster allocation"""
     if x.shape[1] == 2:
-        plt.scatter(x.T[0], x.T[1], c=c, cmap=plt.cm.Set2, alpha=0.5)
+        plt.scatter(x.T[0], x.T[1], c=c, cmap=plt.cm.spectral, alpha=0.5)
         plt.scatter(centroids.T[0], centroids.T[1], marker='*', s=100)
     elif x.shape[1] == 3:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1, projection='3d')
-        ax.scatter(x.T[0], x.T[1], x.T[2], c=c, cmap=plt.cm.Set2)
+        ax.scatter(x.T[0], x.T[1], x.T[2], c=c, cmap=plt.cm.spectral, alpha=0.5)
         ax.scatter(centroids.T[0], centroids.T[1], centroids.T[2], marker='*')
 
 
