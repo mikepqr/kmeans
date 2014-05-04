@@ -7,7 +7,6 @@ assert Axes3D
 def randomdata(K=4, m=1000, ndim=2, sigma=0.4):
     """Generate random data for use in testing K-means algorithm.
     """
-
     # c will hold cluster assignment for each of m points
     c = np.zeros(m)
     # centroid will hold location of K centroids
@@ -73,7 +72,7 @@ def plotkmeans(x, c, centroids):
     elif x.shape[1] == 3:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1, projection='3d')
-        ax.scatter(x.T[0], x.T[1], x.T[2], c=c, cmap=plt.cm.spectral, 
+        ax.scatter(x.T[0], x.T[1], x.T[2], c=c, cmap=plt.cm.spectral,
                    alpha=0.5)
         ax.scatter(centroids.T[0], centroids.T[1], centroids.T[2], marker='*')
 
@@ -82,15 +81,18 @@ def kmeans(x, K, n=10):
     """Divide data x into K clusters using K-means unsupervised learning"""
     m, ndim = x.shape
     c = np.zeros(m)
+    centroidshistory = []
 
     # Perform k-means algorithm n times, using different starting centroids
     # each time
     for j in range(n):
         # Initialize centroids
         centroids = choosestartingpoint(x, K)
-        newcentroids = centroids * 0.
 
         while True:
+            # Record centroids
+            centroidshistory.append(centroids)
+            newcentroids = np.zeros((K, ndim))
             # For every data point, determine cluster allocation
             for i in range(0, m):
                 c[i] = clusterassign(x[i], centroids)
@@ -98,7 +100,7 @@ def kmeans(x, K, n=10):
             for i in range(0, K):
                 newcentroids[i] = np.mean(x[c == i], 0)
             # Repeat until centroids no longer moving
-            if np.mean(abs(newcentroids - centroids)) < 0.01:
+            if np.all((newcentroids - centroids) == 0.0):
                 break
             else:
                 centroids = newcentroids
@@ -119,12 +121,12 @@ def kmeans(x, K, n=10):
     for i in range(0, m):
         c[i] = clusterassign(x[i], bestcentroids)
 
-    return bestcentroids, c, lowestdistortion
+    return bestcentroids, c, lowestdistortion, centroidshistory
 
 
 def demo(m=1000, K=4, ndim=2):
     x = randomdata(K=K, m=m, ndim=ndim)
-    centroids, c, lowestdistortion = kmeans(x, K)
+    centroids, c, lowestdistortion, centroidshistory = kmeans(x, K)
     plotkmeans(x, c, centroids)
 
 
@@ -134,6 +136,6 @@ def demo_elbow():
     x = randomdata()
     distortions = tryk * 0.
     for i, thisk in enumerate(tryk):
-        centroids, c, distortions[i] = kmeans(x, K=thisk)
+        centroids, c, distortions[i], centroidshistory = kmeans(x, K=thisk)
 
     plt.plot(tryk, distortions)
