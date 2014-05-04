@@ -49,34 +49,65 @@ def choosestartingpoint(x, K):
     return x[i, :]
 
 
-def kmeans(x, K):
+def calcdistortion(x, c, u):
+    m = x.shape[0]
+    distortion = 0
+    for i in range(m):
+        distortion += np.sum((x[i] - u[c[i]])**2)
+    distortion /= m
+
+    return distortion
+
+
+def kmeans(x, K, n=10):
     """
     Divide data x into K clusters using K-means unsupervised learning
     """
     m, ndim = x.shape
     c = np.zeros(m)
-    centroids = choosestartingpoint(x, K)
-    newcentroids = choosestartingpoint(x, K)
 
-    while True:
-        print "Assigning"
-        for i in range(0, m):
-            c[i] = clusterassign(x[i, :], centroids)
+    # Perform k-means algorithm n times, using different starting centroids
+    # each time
+    for j in range(n):
+        # Initialize centroids
+        centroids = choosestartingpoint(x, K)
+        newcentroids = centroids * 0.
 
-        print "Moving"
-        for i in range(0, K):
-            newcentroids[i] = np.mean(x[c == i], 0)
+        # Repeat until centroids no longer moving
+        while True:
+            for i in range(0, m):
+                c[i] = clusterassign(x[i], centroids)
 
-        print "Testing for move"
-        if np.mean(newcentroids - centroids) < 1e-12:
-            break
-        else:
-            centroids = newcentroids
+            for i in range(0, K):
+                newcentroids[i] = np.mean(x[c == i], 0)
+
+            if np.mean(abs(newcentroids - centroids)) < 0.01:
+                break
+            else:
+                centroids = newcentroids
+
+        distortion = calcdistortion(x, c, centroids)
+        try:
+            lowestdistortion
+        except NameError:
+            print "New lowest distortion", distortion
+            lowestdistortion = distortion
+            bestcentroids = centroids
+
+        if distortion < lowestdistortion:
+            print "New lowest distortion", distortion
+            lowestdistortion = distortion
+            bestcentroids = centroids
+
+    # Assign to final cluster locations
+    for i in range(0, m):
+        c[i] = clusterassign(x[i], bestcentroids)
 
     markers = ['s', 'o', 'h', '+']
     colors = ['red', 'blue', 'green', 'cyan']
     for i in range(0, K):
         plt.scatter(x[c == i].T[0], x[c == i].T[1],
                     marker=markers[i], color=colors[i])
+    plt.scatter(bestcentroids.T[0], bestcentroids.T[1], marker='*')
 
-    return centroids, c
+    return None
