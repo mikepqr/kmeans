@@ -123,7 +123,6 @@ def demo(m=1000, K=4, ndim=2):
     x = randomdata(K=K, m=m, ndim=ndim)
     centroids, c, lowestdistortion = kmeans(x, K)
     plotkmeans(x, c, centroids)
-    print centroids
 
 
 def demo_elbow():
