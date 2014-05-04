@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+assert Axes3D
 
 
 def randomdata(K=4, m=1000, ndim=2, sigma=0.4):
@@ -72,7 +73,8 @@ def plotkmeans(x, c, centroids):
     elif x.shape[1] == 3:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1, projection='3d')
-        ax.scatter(x.T[0], x.T[1], x.T[2], c=c, cmap=plt.cm.spectral, alpha=0.5)
+        ax.scatter(x.T[0], x.T[1], x.T[2], c=c, cmap=plt.cm.spectral, 
+                   alpha=0.5)
         ax.scatter(centroids.T[0], centroids.T[1], centroids.T[2], marker='*')
 
 
